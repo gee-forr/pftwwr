@@ -7,5 +7,5 @@ Gem::Specification.new do |s|
   s.authors     = ["Gabriel Fortuna"]
   s.email       = ["gee.forr@gmail.com"]
   s.homepage    = "http://rubylearning.org/"
-  s.files       = ["lib/my_string_extend.rb"]
+  s.files       = ["lib/my_string_extend_gf.rb"]
 end
