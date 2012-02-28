@@ -10,29 +10,35 @@ word    = 'the'
 regexp  = /\bthe\b/i
 methods = {}
 
-def scan_for_word(text, regexp)
+def scan_for_word(regexp)
+  text = yield
   text.scan(regexp).count
 end
 
 # Net::HTTP
-url = URI.parse(uri)
+methods['Net::HTTP'] = scan_for_word(regexp) do
+  url = URI.parse(uri)
 
-Net::HTTP.start(url.host, url.port) do |http|
-  request              = Net::HTTP::Get.new(url.path)
-  methods['Net::HTTP'] = scan_for_word(http.request(request).body, regexp)
+  Net::HTTP.start(url.host, url.port) do |http|
+    request              = Net::HTTP::Get.new(url.path)
+    http.request(request).body
+  end
 end
 
 # Open URI
-uri_file            = open uri
-methods['Open URI'] = scan_for_word(uri_file.readlines.join, regexp)
+methods['Open URI'] = scan_for_word(regexp) do
+  open(uri).readlines.join
+end
 
 # Hpricot
-hpricot_doc        = Hpricot(open uri)
-methods['Hpricot'] = scan_for_word(hpricot_doc.to_s, regexp)
+methods['Hpricot'] = scan_for_word(regexp) do
+  Hpricot(open uri).to_s
+end
 
 # Nokogiri 
-noko_doc            = Nokogiri::HTML(open uri)
-methods['Nokogiri'] = scan_for_word(noko_doc.to_s, regexp)
+methods['Nokogiri'] = scan_for_word(regexp) do
+  Nokogiri::HTML(open uri).to_s
+end
 
 methods.each do |type, count|
   puts "#{type} found #{count} instances of the word '#{word}'"
