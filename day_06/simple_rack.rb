@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 
 simple_rack = lambda do |env|
-  [200, {}, ["Hello. The time is #{Time.now}"]]
+  body = "Command line argument you typed was: #{env['QUERY_STRING'].scan(/=(.*)$/).first.first}"
+
+  [200, {'Content-Type' => 'text/plain', 'Content-Length' => body.length}, [[body]]]
 end
 
 environment = {
@@ -11,7 +13,7 @@ environment = {
   'SERVER_PORT'       => 80,
   'rack.version'      => [1,1],
   'rack.url_scheme'   => 'http',
-  'rack.input'        => IO.new,
+  'rack.input'        => '',
   'rack.errors'       => '',
   'rack.multithread'  => false,
   'rack.multiprocess' => false,
@@ -19,3 +21,9 @@ environment = {
 }
 
 response = simple_rack.call(environment)
+
+puts response.first
+response[1].each do |k, v|
+  puts "#{k} => #{v}"
+end
+puts response.last.join
